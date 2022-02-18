@@ -1,46 +1,40 @@
-// ignore_for_file: file_names, prefer_typing_uninitialized_variables, must_be_immutable
+// ignore_for_file: file_names, prefer_typing_uninitialized_variables, must_be_immutable, avoid_print
 
-import 'package:app/pages/door.dart';
-import 'package:app/pages/home.dart';
-import 'package:app/pages/settings.dart';
+import 'dart:convert';
+
+import '../pages/login.dart';
 import 'package:flutter/material.dart';
+import '../src/startData.dart';
+import 'package:http/http.dart' as http;
 
 //storage.getItem('index')
-//storage.setItem('index', 1);
+
+Future<StartInfo> getUserData() async {
+  final response = await http.post(
+    Uri.parse(
+        'https://my-json-server.typicode.com/typicode/demo/posts/1'), //http://192.168.178.64:80/getUserInfo.php
+    headers: {'Content-Type': 'application/json; charset=UTF-8'},
+    body: jsonEncode({
+      "id": "1",
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    return jsonDecode(response.body);
+  } else {
+    throw Exception("Fehler");
+  }
+}
 
 class MyMobileBody extends StatelessWidget {
-  int _selectedIndex = 0;
-  dynamic _context;
+  dynamic username;
 
   MyMobileBody({Key? key}) : super(key: key);
 
-  void _navigateBottomBar(int index) {
-    _selectedIndex = index;
-    (_context as Element).markNeedsBuild();
-  }
-
-  final List<Widget> _pages = [
-    const UserHome(),
-    const UserDoor(),
-    UserSettings(),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    _context = context;
     return Scaffold(
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _navigateBottomBar,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.black45,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.door_front_door), label: 'Tür'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Einstellungen'),
-        ],
-      ),
+      body: Login(),
     );
   }
 }

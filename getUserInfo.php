@@ -64,4 +64,3 @@ class Spacecrafts
 }
 $spacecrafts=new Spacecrafts();
 $spacecrafts->select();
-
