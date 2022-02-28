@@ -4,12 +4,11 @@ import 'dart:convert';
 
 import '../pages/login.dart';
 import 'package:flutter/material.dart';
-import '../src/startData.dart';
 import 'package:http/http.dart' as http;
 
 //storage.getItem('index')
 
-Future<StartInfo> getUserData() async {
+getUserData() async {
   final response = await http.post(
     Uri.parse(
         'https://my-json-server.typicode.com/typicode/demo/posts/1'), //http://192.168.178.64:80/getUserInfo.php
@@ -34,7 +33,7 @@ class MyMobileBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Login(),
+      body: Center(child: Login()),
     );
   }
 }
