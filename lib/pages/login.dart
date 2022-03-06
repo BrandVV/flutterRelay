@@ -1,9 +1,10 @@
-// ignore_for_file: avoid_types_as_parameter_names, avoid_print, must_be_immutable
+// ignore_for_file: avoid_types_as_parameter_names, avoid_print, must_be_immutable, nullable_type_in_catch_clause, empty_catches, non_constant_identifier_names
 
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'home.dart';
 
 class Login extends StatelessWidget {
@@ -162,16 +163,27 @@ class Login extends StatelessWidget {
   checkLogin(context, username, passwort) async {
     print("Start Login");
     var a = await authUser(context, username, passwort);
-    print(a);
-
-    if (emailController.text == "kali") {
-      if (passwordController.text == "kali") {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const UserHome()));
-      } else {
-        getLoginAlert(context);
-      }
+    print("a = " + a);
+    Map<String, dynamic> userMap = jsonDecode(a);
+    print("userMap: " + userMap.toString());
+    var Username = userMap['name'];
+    var Permission = userMap['permissions'];
+    var error = userMap['error'];
+    if (error != "000") {
+      getLoginAlert(context, "Falsche Anmeldedaten");
     } else {
-      getLoginAlert(context);
+      if (Username != Null && Username != "") {
+        if (Permission != Null && Permission != "") {
+          await saveData("username", Username.toString());
+          await saveData("permission", Permission.toString());
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const UserHome()));
+          //print('Login Erfolg');
+        } else {
+          getLoginAlert(context, error);
+        }
+      } else {
+        getLoginAlert(context, error);
+      }
     }
   }
 
@@ -179,14 +191,13 @@ class Login extends StatelessWidget {
     Navigator.push(context, MaterialPageRoute(builder: (context) => const UserHome()));
   }
 
-  getLoginAlert(_context) {
+  getLoginAlert(_context, String error) {
     return showDialog(
       context: _context,
       builder: (BuildContext context) => AlertDialog(
         backgroundColor: const Color(0xFFF27121),
         title: const Text("Falsche Daten"),
-        content: const Text(
-            "Du hast ein flasches Passwort oder eine falsche Email angegeben!"),
+        content: Text("Fehler: " + error),
         actions: [
           ElevatedButton(
             onPressed: () {
@@ -199,8 +210,8 @@ class Login extends StatelessWidget {
     );
   }
 
-  Future<http.Response> authUser(context, username, passwort) {
-    return http.post(Uri.parse('https://jsonplaceholder.typicode.com/albums'),
+  authUser(context, username, passwort) async {
+    var res = await http.post(Uri.parse('http://192.168.178.93/login'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -210,5 +221,22 @@ class Login extends StatelessWidget {
         'action': "auth",
       }),
     );
+
+    return res.body;
+  }
+
+  readData(String dataKey) async {
+    final prefs = await SharedPreferences.getInstance();
+    final key = dataKey;
+    final value = prefs.getString(key) ?? 0;
+    return value;
+  }
+
+  saveData(String _dataKey, String _data) async {
+    final prefs = await SharedPreferences.getInstance();
+    final key = _dataKey;
+    final data = _data;
+    final value = prefs.setString(key, data);
+    return value;
   }
 }

@@ -7,6 +7,7 @@ void main() async {
   runApp(const MyApp());
 }
 
+//Hauptmethode der App
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      home: HomePage(), //Klasse Homepage aus 'homepage.dart'
     );
   }
 }

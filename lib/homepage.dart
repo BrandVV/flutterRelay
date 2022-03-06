@@ -14,7 +14,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ResponsiveLayout(mobileBody: MyMobileBody(), desktopBody: const MyDesktopBody()),
+      body: ResponsiveLayout(mobileBody: MyMobileBody(), desktopBody: const MyDesktopBody()), //Verschiedene Layouts für Bildschirmgrößen
     );
   }
 }

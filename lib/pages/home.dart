@@ -1,6 +1,7 @@
 import 'package:app/pages/door.dart';
 import 'package:flutter/material.dart';
 import 'package:app/pages/settings.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserHome extends StatelessWidget {
   const UserHome({Key? key}) : super(key: key);
@@ -115,7 +116,7 @@ class UserHome extends StatelessWidget {
   }
 
   switchSite(context) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const UserSettings()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => UserSettings()));
   }
 
   createButton(context, String text, String ziel) {
@@ -139,10 +140,10 @@ class UserHome extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(12.0),
           child: GestureDetector(
-            onTap: () {
+            onTap: () async {
               //print("hi");
               if (ziel == "settings") {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const UserSettings()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => UserSettings()));
               } else if (ziel == "door") {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => UserDoor()));
               }

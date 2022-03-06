@@ -1,31 +1,19 @@
 // ignore_for_file: avoid_print, must_be_immutable, non_constant_identifier_names, unused_field
 
-import 'dart:convert';
 import 'dart:core';
 import 'package:app/pages/door.dart';
 import 'package:app/pages/home.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
-getUserData() async {
-  final response = await http.get(
-    Uri.parse(
-        'https://my-json-server.typicode.com/typicode/demo/posts/1'), //http://192.168.178.64:80/getUserInfo.php
-    headers: {'Content-Type': 'application/json; charset=UTF-8'},
-    //body: jsonEncode({
-    //  "id": "1",
-    //})
-  );
-
-  if (response.statusCode == 200) {
-    return jsonDecode(response.body);
-  } else {
-    throw Exception("Fehler beim Abgleich der Daten");
-  }
-}
-
-class UserSettings extends StatelessWidget {
+class UserSettings extends StatefulWidget {
   const UserSettings({Key? key}) : super(key: key);
+
+  @override
+  State<UserSettings> createState() => _UserSettings();
+}
+class _UserSettings extends State<UserSettings> {
+  int value = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -87,9 +75,11 @@ class UserSettings extends StatelessWidget {
                             color: Colors.grey,
                           ),
                         ),
+                        const SizedBox(height: 40),
+                        CustomRadioButton("Darkmode", 1),
                         const SizedBox(height: 80),
                         createButton(context, "Home", "home"),
-                        const SizedBox(height: 80),
+                        const SizedBox(height: 40),
                         createButton(context, "Tür - Steuerung", "door"),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(20, 20, 40, 20),
@@ -158,6 +148,49 @@ class UserSettings extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  readData(String dataKey) async {
+    final prefs = await SharedPreferences.getInstance();
+    final key = dataKey;
+    final value = prefs.getString(key) ?? 0;
+    return value;
+  }
+
+  saveData(String _dataKey, String _data) async {
+    final prefs = await SharedPreferences.getInstance();
+    final key = _dataKey;
+    final data = _data;
+    final value = prefs.setString(key, data);
+    return value;
+  }
+
+  Widget CustomRadioButton(String text, int index) {
+    // ignore: deprecated_member_use
+    return OutlineButton(
+      onPressed: () async {
+        if (value != index) {
+          await saveData("darkmode", "1");
+          setState(() {
+            value = index;
+          });
+        } else {
+          await saveData("darkmode", "0");
+          setState(() {
+            value = 0;
+          });
+        }
+      },
+      child: Text(
+        text,
+        style: TextStyle(
+          color: (value == index) ? Colors.green : Colors.black,
+        ),
+      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      borderSide:
+          BorderSide(color: (value == index) ? Colors.green : Colors.black),
     );
   }
 }
