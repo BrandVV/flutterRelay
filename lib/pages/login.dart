@@ -7,11 +7,22 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'home.dart';
 
-class Login extends StatelessWidget {
-  Login({Key? key}) : super(key: key);
+class Login extends StatefulWidget {
+  late String darkmode;
+  late String autoLogin;
 
+  Login({Key? key, required this.darkmode, required this.autoLogin}) : super(key: key);
+
+  @override
+  State<Login> createState() => _Login();
+}
+
+class _Login extends State<Login> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+
+  int value = 0;
+  String buttonText = "Eingeloggt bleiben: Off";
 
   @override
   Widget build(BuildContext context) {
@@ -50,18 +61,19 @@ class Login extends StatelessWidget {
                   height: 480,
                   width: 325,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: returnDarkmodeColor(widget.darkmode),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const SizedBox(height: 30),
-                      const Text(
+                      Text(
                         "Anmeldung",
                         style: TextStyle(
                           fontSize: 35,
                           fontWeight: FontWeight.bold,
+                          color: returnDarkmodeTextColor(widget.darkmode),
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -76,10 +88,14 @@ class Login extends StatelessWidget {
                       Container(
                         width: 250,
                         child: TextField(
+                          style: TextStyle(color: returnDarkmodeTextColor(widget.darkmode)),
                           controller: emailController,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: "Email oder Username",
-                            suffixIcon: Icon(Icons.email, size: 17),
+                            labelStyle: TextStyle(
+                              color: returnDarkmodeTextColor(widget.darkmode),
+                            ),
+                            suffixIcon: const Icon(Icons.email, size: 17),
                           ),
                         ),
                       ),
@@ -88,9 +104,12 @@ class Login extends StatelessWidget {
                         child: TextField(
                           controller: passwordController,
                           obscureText: true,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: "Password",
-                            suffixIcon: Icon(Icons.password, size: 17),
+                            labelStyle: TextStyle(
+                              color: returnDarkmodeTextColor(widget.darkmode),
+                            ),
+                            suffixIcon: const Icon(Icons.password, size: 17),
                           ),
                         ),
                       ),
@@ -108,6 +127,7 @@ class Login extends StatelessWidget {
                           ],
                         ),
                       ),
+                      CustomRadioButton(buttonText, 1),
                       const SizedBox(height: 20),
                       GestureDetector(
                         child: Container(
@@ -129,17 +149,23 @@ class Login extends StatelessWidget {
                             padding: const EdgeInsets.all(12.0),
                             child: GestureDetector(
                               onTap: () async {
+                                //print(widget.darkmode);
                                 //var status = await Permission.storage.status;
                                 //if (status.isDenied) {
                                 //  await Permission.storage.request();
                                 //  return;
                                 //}
+                                String autoLogin = await readData("autoLogin");
+                                if (autoLogin == "true") {
+                                  await saveData("username", emailController.text);
+                                  await saveData("passwort", passwordController.text);
+                                }
                                 await checkLogin(context, emailController.text, passwordController.text);
                               },
-                              child: const Text(
+                              child: Text(
                                 "Login",
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: returnDarkmodeButtonColor(widget.darkmode),
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -176,7 +202,7 @@ class Login extends StatelessWidget {
         if (Permission != Null && Permission != "") {
           await saveData("username", Username.toString());
           await saveData("permission", Permission.toString());
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const UserHome()));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => UserHome(darkmode: widget.darkmode)));
           //print('Login Erfolg');
         } else {
           getLoginAlert(context, error);
@@ -185,10 +211,6 @@ class Login extends StatelessWidget {
         getLoginAlert(context, error);
       }
     }
-  }
-
-  checkLoginBeta(context) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const UserHome()));
   }
 
   getLoginAlert(_context, String error) {
@@ -238,5 +260,68 @@ class Login extends StatelessWidget {
     final data = _data;
     final value = prefs.setString(key, data);
     return value;
+  }
+
+  Widget CustomRadioButton(String text, int index) {
+    // ignore: deprecated_member_use
+    print(widget.autoLogin);
+    return OutlineButton(
+      onPressed: () async {
+        if (value != index) {
+          await saveData("autoLogin", "false");
+          setState(() {
+            value = index;
+            buttonText = "Eingeloggt bleiben: Off";
+            widget.autoLogin = "false";
+          });
+        } else {
+          await saveData("autoLogin", "true");
+          setState(() {
+            value = 0;
+            buttonText = "Eingeloggt bleiben: On";
+            widget.autoLogin = "true";
+          });
+        }
+      },
+      child: Text(
+        text,
+        style: TextStyle(
+          color: (value == index) ? const Color.fromARGB(255, 0, 0, 0) : Colors.green,
+        ),
+      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      borderSide:
+          BorderSide(color: (value == index) ? Colors.green : Colors.white),
+    );
+  }
+
+  returnDarkmodeColor(String darkmode) {
+    print("Home - Darkmode: " + darkmode);
+    if (darkmode == "0" || darkmode == "Darkmode: Off") {
+      return Colors.white;
+    }
+    if (darkmode == "1" || darkmode == "Darkmode: On") {
+      return const Color.fromARGB(255, 39, 39, 39);
+    }
+  }
+
+  returnDarkmodeTextColor(String darkmode) {
+    if (darkmode == "0" || darkmode == "Darkmode: Off") {
+      return Colors.black;
+    }
+    if (darkmode == "1" || darkmode == "Darkmode: On") {
+      return Colors.white;
+    }
+  }
+
+  Color returnDarkmodeButtonColor(String darkmode) {
+    Color color = Colors.white;
+    if (darkmode == "0" || darkmode == "Darkmode: Off") {
+      color = Colors.white;
+    }
+    if (darkmode == "1" || darkmode == "Darkmode: On") {
+      color = const Color.fromARGB(255, 39, 39, 39);
+    }
+    return color;
   }
 }

@@ -7,17 +7,22 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserSettings extends StatefulWidget {
-  const UserSettings({Key? key}) : super(key: key);
+  late String darkmode;
+
+  UserSettings({Key? key, required this.darkmode}) : super(key: key);
 
   @override
   State<UserSettings> createState() => _UserSettings();
 }
+
 class _UserSettings extends State<UserSettings> {
   int value = 0;
+  String underTitel = "Aktion wählen";
+  //String buttonText = "Darkmode: Test"; //widget.darkmode;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Scaffold (
       body: Column(
         children: [
           SingleChildScrollView(
@@ -53,34 +58,35 @@ class _UserSettings extends State<UserSettings> {
                     height: 480,
                     width: 325,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: returnDarkmodeColor(widget.darkmode), //Colors.white,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const SizedBox(height: 30),
-                        const Text(
-                          "Home",
+                        Text(
+                          "Einstellungen",
                           style: TextStyle(
                             fontSize: 35,
                             fontWeight: FontWeight.bold,
+                            color: returnDarkmodeTextColor(widget.darkmode),
                           ),
                         ),
                         const SizedBox(height: 10),
-                        const Text(
-                          "Aktion wählen",
-                          style: TextStyle(
+                        Text(
+                          underTitel,
+                          style: const TextStyle(
                             fontSize: 15,
                             color: Colors.grey,
                           ),
                         ),
                         const SizedBox(height: 40),
-                        CustomRadioButton("Darkmode", 1),
+                        CustomRadioButton(widget.darkmode, 1),
                         const SizedBox(height: 80),
-                        createButton(context, "Home", "home"),
+                        createButton(context, "Home", "home", returnDarkmodeButtonColor(widget.darkmode)),
                         const SizedBox(height: 40),
-                        createButton(context, "Tür - Steuerung", "door"),
+                        createButton(context, "Tür - Steuerung", "door", returnDarkmodeButtonColor(widget.darkmode)),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(20, 20, 40, 20),
                           child: Row(
@@ -109,7 +115,7 @@ class _UserSettings extends State<UserSettings> {
     );
   }
 
-  createButton(context, String text, String ziel) {
+  createButton(context, String text, String ziel, Color textFarbe) {
     return GestureDetector(
       child: Container(
         alignment: Alignment.center,
@@ -132,15 +138,15 @@ class _UserSettings extends State<UserSettings> {
             onTap: () {
               //print("hi");
               if (ziel == "home") {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const UserHome()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => UserHome(darkmode: widget.darkmode)));
               } else if (ziel == "door") {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => UserDoor()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => UserDoor(darkmode: widget.darkmode)));
               }
             },
             child: Text(
               text,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: textFarbe,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -167,30 +173,74 @@ class _UserSettings extends State<UserSettings> {
   }
 
   Widget CustomRadioButton(String text, int index) {
+    print(text);
+    if (text == "Darkmode: Off") {
+      setState(() {
+        value = index;
+      });
+      UserSettings(darkmode: widget.darkmode);
+    }
+
     // ignore: deprecated_member_use
     return OutlineButton(
       onPressed: () async {
+        print(value);
         if (value != index) {
-          await saveData("darkmode", "1");
-          setState(() {
-            value = index;
-          });
-        } else {
           await saveData("darkmode", "0");
           setState(() {
+            value = index;
+            widget.darkmode = "Darkmode: Off";
+            print("Darkmode-State: " + widget.darkmode);
+            UserSettings(darkmode: widget.darkmode);
+          });
+        } else {
+          await saveData("darkmode", "1");
+          setState(() {
             value = 0;
+            widget.darkmode = "Darkmode: On";
+            UserSettings(darkmode: widget.darkmode);
           });
         }
       },
       child: Text(
         text,
         style: TextStyle(
-          color: (value == index) ? Colors.green : Colors.black,
+          color: (value == index) ? Colors.black : Colors.green,
         ),
       ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       borderSide:
-          BorderSide(color: (value == index) ? Colors.green : Colors.black),
+          BorderSide(color: (value == index) ? Colors.green : Colors.white),
     );
+  }
+
+  returnDarkmodeColor(String darkmode) {
+    print("Home - Darkmode: " + darkmode);
+    if (darkmode == "0" || darkmode == "Darkmode: Off") {
+      return Colors.white;
+    }
+    if (darkmode == "1" || darkmode == "Darkmode: On") {
+      return const Color.fromARGB(255, 39, 39, 39);
+    }
+  }
+
+  returnDarkmodeTextColor(String darkmode) {
+    if (darkmode == "0" || darkmode == "Darkmode: Off") {
+      return Colors.black;
+    }
+    if (darkmode == "1" || darkmode == "Darkmode: On") {
+      return Colors.white;
+    }
+  }
+
+  Color returnDarkmodeButtonColor(String darkmode) {
+    Color color = Colors.white;
+    if (darkmode == "0" || darkmode == "Darkmode: Off") {
+      color = Colors.white;
+    }
+    if (darkmode == "1" || darkmode == "Darkmode: On") {
+      color = const Color.fromARGB(255, 39, 39, 39);
+    }
+    return color;
   }
 }

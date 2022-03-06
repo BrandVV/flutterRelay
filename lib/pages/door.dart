@@ -7,7 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class UserDoor extends StatelessWidget {
-  UserDoor({Key? key}) : super(key: key);
+  late String darkmode;
+  UserDoor({Key? key, required this.darkmode}) : super(key: key);
 
   final doorController = TextEditingController();
 
@@ -49,18 +50,19 @@ class UserDoor extends StatelessWidget {
                     height: 480,
                     width: 325,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: returnDarkmodeColor(darkmode),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const SizedBox(height: 30),
-                        const Text(
-                          "Home",
+                        Text(
+                          "Steuerung",
                           style: TextStyle(
                             fontSize: 35,
                             fontWeight: FontWeight.bold,
+                            color: returnDarkmodeTextColor(darkmode),
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -77,16 +79,17 @@ class UserDoor extends StatelessWidget {
                           child: TextField(
                             keyboardType: TextInputType.number,
                             controller: doorController,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               labelText: "Öffnungs-Zeit (maximal 5)",
-                              suffixIcon: Icon(Icons.book_online , size: 17),
+                              labelStyle: TextStyle(color: returnDarkmodeTextColor(darkmode)),
+                              suffixIcon: const Icon(Icons.book_online , size: 17),
                             ),
                           ),
                         ),
                         const SizedBox(height: 30),
-                        createButton(context, "Öffnen", "open_door"),
+                        createButton(context, "Öffnen", "open_door", returnDarkmodeButtonColor(darkmode)),
                         const SizedBox(height: 50),
-                        createButton(context, "Home", "home"),
+                        createButton(context, "Home", "home", returnDarkmodeButtonColor(darkmode)),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(20, 20, 40, 20),
                           child: Row(
@@ -115,7 +118,7 @@ class UserDoor extends StatelessWidget {
     );
   }
 
-  createButton(context, String text, String ziel) {
+  createButton(context, String text, String ziel, Color textFarbe) {
     return GestureDetector(
       child: Container(
         alignment: Alignment.center,
@@ -138,7 +141,7 @@ class UserDoor extends StatelessWidget {
             onTap: () async {
               //print("hi");
               if (ziel == "home") {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const UserHome()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => UserHome(darkmode: darkmode)));
               } else if (ziel == "open_door") {
                 if (doorController.text == null) {
                   getAlert(context, "Fehler", "Du musst eine Zeit angeben");
@@ -155,8 +158,8 @@ class UserDoor extends StatelessWidget {
             },
             child: Text(
               text,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: textFarbe,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -224,5 +227,35 @@ class UserDoor extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  returnDarkmodeColor(String darkmode) {
+    print("Home - Darkmode: " + darkmode);
+    if (darkmode == "0" || darkmode == "Darkmode: Off") {
+      return Colors.white;
+    }
+    if (darkmode == "1" || darkmode == "Darkmode: On") {
+      return const Color.fromARGB(255, 39, 39, 39);
+    }
+  }
+
+  returnDarkmodeTextColor(String darkmode) {
+    if (darkmode == "0" || darkmode == "Darkmode: Off") {
+      return Colors.black;
+    }
+    if (darkmode == "1" || darkmode == "Darkmode: On") {
+      return Colors.white;
+    }
+  }
+
+  Color returnDarkmodeButtonColor(String darkmode) {
+    Color color = Colors.white;
+    if (darkmode == "0" || darkmode == "Darkmode: Off") {
+      color = Colors.white;
+    }
+    if (darkmode == "1" || darkmode == "Darkmode: On") {
+      color = const Color.fromARGB(255, 39, 39, 39);
+    }
+    return color;
   }
 }
