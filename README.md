@@ -66,7 +66,7 @@ Twitter | Email - [@BrandyV2_0](https://twitter.com/BrandyV2_0) - admin@brand-v.
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
-Use this space to list resources you find helpful and would like to give credit to. I've included a few of my favorites to kick things off!
+This are very helpful Pages that helped me find Inspiration or to fix problems with the app and I would like to aknowledge them.
 
 * [GitHub Pages](https://pages.github.com)
 * [Stack Overflow](stackoverflow.com)
