@@ -151,7 +151,7 @@ class UserDoor extends StatelessWidget {
                   var response = await openDoor(context, doorController.text);
                   if (response == 404) {
                     response ??= "Unbekannt";
-                    getAlert(context, "Fehler: $response", "Die API hat den Fehlercode: *$response* zurückgegeben. Bitte kontaktieren Sie Niklas");
+                    getAlert(context, "Fehler: $response", "Die API hat den Fehlercode: *$response* zurückgegeben. Bitte kontaktieren Sie den Entwickler");
                   }
                 }
               }
@@ -186,7 +186,7 @@ class UserDoor extends StatelessWidget {
         try {
           final response = await http.post(
             Uri.parse(
-                'http://192.168.188.21/relay/0?turn=on&timer=$zeit'), //http://192.168.178.64:80/getUserInfo.php || https://reqbin.com/echo/post/json || http://192.168.188.21/relay/0?turn=on&timer=$zeit
+                'url/relay/0?turn=on&timer=$zeit'), //url/getUserInfo.php || url/relay/0?turn=on&timer=$zeit
             headers: {'Content-Type': 'application/json; charset=UTF-8'},
             body: jsonEncode({
               "id": "1",
