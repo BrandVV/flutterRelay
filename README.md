@@ -10,7 +10,7 @@ This is a mobile App developed in Flutter. This was the interaction Point for a 
 
 ### Built With
 
-* [Flutter - SDK]([https://docs.flutter.dev/get-started/install])
+* [Flutter - SDK]([https://docs.flutter.dev/get-started/install]
 * [Android - Studio]([https://developer.android.com/studio]) | Required for Android
 * [VS - Code]([https://code.visualstudio.com/])
 
