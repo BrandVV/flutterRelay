@@ -59,7 +59,7 @@ You can just open Requests for Issues with the App for Bugs or to commit some wi
 <!-- CONTACT -->
 ## Contact
 
-BrandyV2_0 - [@BrandyV2_0](https://twitter.com/BrandyV2_0) - admin@brand-v.org
+Twitter | Email - [@BrandyV2_0](https://twitter.com/BrandyV2_0) - admin@brand-v.org
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
