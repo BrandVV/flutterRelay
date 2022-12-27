@@ -233,7 +233,7 @@ class _Login extends State<Login> {
   }
 
   authUser(context, username, passwort) async {
-    var res = await http.post(Uri.parse('http://192.168.178.93/login'),
+    var res = await http.post(Uri.parse('url/login'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
